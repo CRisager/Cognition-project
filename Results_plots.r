@@ -1,7 +1,10 @@
 
 ############# Load data ################
 # Read data
-D <- read.csv("C:/Users/cheli/Downloads/Data.csv", header = TRUE, sep = ",", quote = "\"")
+# Jesper:
+D <- read.csv("/Users/jesperberglund/Downloads/Data.csv", header = TRUE, sep = ",", quote = "\"")
+# Chelina:
+#D <- read.csv("C:/Users/cheli/Downloads/Data.csv", header = TRUE, sep = ",", quote = "\"")
 
 neutral_grades <- D$grade[D$Text_version == "Neutral"]
 positive_grades <- D$grade[D$Text_version == "Positive"]
@@ -37,11 +40,6 @@ axis(1, at = 1:3, labels = c("Positive", "Neutral", "Negative"), las = 1)
 axis(2, at = seq(0, 100, by = 10), labels = seq(0, 100, by = 10))
 title("Boxplots of grades")
 dev.off()
-
-
-
-
-
 
 
 # Bar plot of all grades
@@ -145,8 +143,6 @@ shapiro.test(negative_grades) # p-value = 0.02389
 
 # At least one of the groups are NOT normally distributes so we
 # cannot use ANOVA
-
-
 
 
 
