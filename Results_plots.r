@@ -91,12 +91,35 @@ shapiro.test(negative_grades) # p-value = 0.02389
 
 ####################### Statistics ########################
 
+# Kruskal-Wallis test
 result_kruskal <- kruskal.test(grade ~ Text_version, data = D)
 result_kruskal$p.value # p-value = 0.7800437
 # p > 0.05 = don't have sufficient reason to believe that the 
 # choice of text version has a statistically significant effect 
 # on the grades.
 
+
+# Calculate effect size
+Group1 = positive_grades
+Group2 = neutral_grades
+Group3 = negative_grades
+# Create all possible pairs of groups
+group_pairs <- list(c("Group1", "Group2"), c("Group1", "Group3"), c("Group2", "Group3"))
+# Initialize an empty vector to store Cohen's d for each pair
+cohen_d_values <- numeric(length(group_pairs))
+# Calculate Cohen's d for each pair of groups
+for (i in seq_along(group_pairs)) {
+  group_pair <- group_pairs[[i]]
+  mean_diff <- mean(get(group_pair[1])) - mean(get(group_pair[2]))
+  pooled_sd <- sqrt(((length(get(group_pair[1])) - 1) * sd(get(group_pair[1]))^2 + 
+                       (length(get(group_pair[2])) - 1) * sd(get(group_pair[2]))^2) / 
+                      (length(get(group_pair[1])) + length(get(group_pair[2])) - 2))
+  cohen_d_values[i] <- mean_diff / pooled_sd
+}
+# Average Cohen's d over all pairs
+average_cohen_d <- mean(cohen_d_values, na.rm = TRUE)
+# Print the result
+average_cohen_d # 0.2365371 = small effect
 
 
 
@@ -148,4 +171,5 @@ F-statistic: 0.6966 on 5 and 55 DF,  p-value: 0.6283
   # suggests that, after controlling for the covariates, 
   # there is no significant difference in the dependent 
   # variable across the groups being compared.
+
 
