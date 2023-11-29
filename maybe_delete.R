@@ -13,6 +13,37 @@ negative_grades <- D$grade[D$Text_version == "Negative"]
 
 ####################### Outlier detection ########################
 
+# Examine outliers based on normally distributed data
+
+# calculate mean and standard deviation for each variable
+mean_positive <- mean(positive_grades)
+sd_positive <- sd(positive_grades)
+mean_negative <- mean(negative_grades)
+sd_negative <- sd(negative_grades)
+mean_neutral <- mean(neutral_grades)
+sd_neutral <- sd(neutral_grades)
+
+# identify outliers for each text version based on normal distribution
+for (i in 1:length(positive_grades)) {
+  if (abs(positive_grades[i] - mean_positive) > 3 * sd_positive) {
+    print(paste("Positive Text outliers: ", positive_grades[i]))
+  }
+}
+for (i in 1:length(negative_grades)) {
+  if (abs(negative_grades[i] - mean_negative) > 3 * sd_negative) {
+    print(paste("Negative Text outliers: ", negative_grades[i]))
+  }
+}
+for (i in 1:length(neutral_grades)) {
+  if (abs(neutral_grades[i] - mean_neutral) > 3 * sd_neutral) {
+    print(paste("Neutral Text outliers: ", neutral_grades[i]))
+  }
+}
+# There are no outliers with our limited data:
+  # If we have 10 data points and one is very low then that is 10% of our
+  # data being low. If we had 100 points then it would be 1%. This changes
+  # how many points would be considered outliers.
+
 # Plot grades to examine the outliers visually
 par(mfrow=c(1,1))
 png(file = "scatterplot_positive.png", units = "cm",
