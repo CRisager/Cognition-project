@@ -17,6 +17,42 @@ print(paste("Avg. negative text grade: " , mean(negative_grades))) # 52.5
 
 
 ############# Plots ################
+# Load required libraries
+library(ggplot2)
+library(ggrain)
+
+# Assuming your data frame is named D with columns 'grade' and 'Text_version'
+# Replace this with the actual names in your dataset
+
+# Define colors based on Text_version
+D$color <- ifelse(D$Text_version == "Positive", "#64cb6b",
+                  ifelse(D$Text_version == "Neutral", "skyblue", "coral"))
+
+# Create a rain cloud plot with ggrain
+my_plot <- ggplot(D, aes(Text_version, grade, fill = color)) +
+  geom_rain(alpha = 0.5) +
+  scale_fill_identity() +  # Use identity scale for manual colors
+  theme_classic() +
+  guides(fill = 'none', color = 'none') +
+  coord_flip() +
+  labs(x = "Text Version", y = "Grade")
+
+# Save the plot as an image (adjust the filename and extension as needed)
+ggsave("rain_cloud_plot.png", my_plot, width = 8, height = 8)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Box plos of grades within each text sentiment
 png(file="Boxplot_text_sep.png",
@@ -78,11 +114,6 @@ barplot(neutral_students, names.arg = possible_grades, col = "coral",
         xlab = "Grades in %", ylim = c(0,5))
 title("Negative Text", line = 0.5, cex.main = 0.8) # Add a subtitle
 dev.off()
-
-
-
-
-
 
 
 # Histogram of grades within each sentiment
