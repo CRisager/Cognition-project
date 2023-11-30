@@ -10,11 +10,15 @@ neutral_grades <- D$grade[D$Text_version == "Neutral"]
 positive_grades <- D$grade[D$Text_version == "Positive"]
 negative_grades <- D$grade[D$Text_version == "Negative"]
 
-
 # Print average grades
 print(paste("Avg. positive text grade: " , mean(positive_grades))) # 60.56
 print(paste("Avg. neutral text grade: " , mean(neutral_grades)))   # 55.26
-print(paste("Avg. negative text grade: " , mean(negative_grades))) # 52.5
+print(paste("Avg. negative text grade: " , mean(negative_grades))) # 52.50
+
+# Print standard deviation
+print(paste("Avg. positive text grade: " , sd(positive_grades))) # 18.30
+print(paste("Avg. neutral text grade: " , sd(neutral_grades)))   # 20.10
+print(paste("Avg. negative text grade: " , sd(negative_grades))) # 28.63
 
 
 
@@ -63,7 +67,7 @@ result_kruskal <- kruskal.test(grade ~ Text_version, data = D)
 result_kruskal$p.value # p-value = 0.7800437
 # p > 0.05 = don't have sufficient reason to believe that the 
 # choice of text version has a statistically significant effect 
-# on the grades.
+# on the grades. 
 
 
 # Calculate effect size
@@ -90,25 +94,69 @@ average_cohen_d # 0.2365371 = small effect
 
 
 
+
+
+############## ANCOVA assumptions ##################
+
+# Linear relationship between independent/covariates and dependent variable
+
+### Grade vs age ###
+par(mfrow=c(1,1))
+plot(D$Age, D$grade, col = "black", pch = 8, cex = 2, main = "grade vs age")
+# Add linear regression line
+abline(lm(D$grade ~ D$Age), col = "red")
+# Add the loess line
+loess_fit <- loess(D$grade ~ D$Age)
+predicted_values <- predict(loess_fit, newdata = data.frame(Age = D$Age))
+lines(D$Age, predicted_values, col = "blue")
+
+# Without the age outlier
+ages <- D$Age[D$Age < 40]
+grades <- D$grade[-length(D$grade)]
+plot(ages, grades, col = "black", pch = 8, cex = 2, main = "grade vs age")
+# Add linear regression line
+abline(lm(grades ~ ages), col = "red")
+# Add the loess line
+loess_fit <- loess(grades ~ ages)
+predicted_values <- predict(loess_fit, newdata = data.frame(Age = ages))
+lines(ages, predicted_values, col = "blue")
+
+# Both look very non-linear and with no clear relationship between the variables
+
+### Grade vs gender ###
+male_grades <- D$grade[D$Gender == "Male"]
+female_grades <- D$grade[D$Gender == "Female"]
+other_grades <- D$grade[D$Gender == "Other"]
+# Boxplot
+# Create an empty plot with the desired range of the y-axis
+plot(1, type = "n", xlim = c(0, 4), ylim = c(0, 100), xlab = "Text sentiment", ylab = "Grade in %", xaxt = "n")
+# Create the boxplots
+boxplot(male_grades, at = 1, add = TRUE, col = "#64cb6b")
+boxplot(female_grades, at = 2, add = TRUE, col = "skyblue")
+boxplot(other_grades, at = 3, add = TRUE, col = "coral")
+# Add the individual data points with random jitter
+jittered_x1 <- jitter(rep(1, length(male_grades)), factor = 1.5)
+jittered_x2 <- jitter(rep(2, length(female_grades)), factor = 1.5)
+jittered_x3 <- jitter(rep(3, length(other_grades)), factor = 1.5)
+points(jittered_x1, male_grades, pch = 21, col = "black")
+points(jittered_x2, female_grades, pch = 21, col = "black")
+points(jittered_x3, other_grades, pch = 21, col = "black")
+# Add the axis labels, ticks and title
+axis(1, at = 1:3, labels = c("Male", "Female", "Other"), las = 1)
+axis(2, at = seq(0, 100, by = 10), labels = seq(0, 100, by = 10))
+title("Boxplots of grades")
+
+# The "male" and "female" grades do not differ significantly fro each other
+# and the "other" grades have too few data points to be comparable. 
+
+
+# Overall, the linearity assumption is not met in a high enough degree
+# to validate utilizing ANCOVA.
+
+
+
+# Hvis man alligevel gør det:
 ################ Examining covariates with ANCOVA ################### 
-
-# An important assumption is residuals being normally distributed.
-
-# QQ-plot to investigate normality of residuals
-library(car)
-# QQ-plot of sentiment separation
-png(file = "QQplot_text_sep.png", units = "cm",
-    res = 1200, height = 1200 / 72, width = 1200 / 72)
-par(mfrow=c(1,3))
-qqPlot(positive_grades, ylab = "Given grades in %")
-title("Positive Text", line = 0.5, cex.main = 0.8) # Add a subtitle
-qqPlot(neutral_grades, ylab = "Given grades in %")
-title("Neutral Text", line = 0.5, cex.main = 0.8) # Add a subtitle
-mtext("QQ plot for grades", side = 3, line = 2)
-qqPlot(negative_grades, ylab = "Given grades in %")
-title("Negative Text", line = 0.5, cex.main = 0.8) # Add a subtitle
-dev.off()
-# They seem normally distributed. Let's continue.
 
 # Fit the ANCOVA model
 ancova_model <- lm(grade ~ Text_version + Age + Gender, data = D)
@@ -140,3 +188,44 @@ F-statistic: 0.6966 on 5 and 55 DF,  p-value: 0.6283
   # variable across the groups being compared.
 
 
+
+
+
+############## GLM ##################
+# Let's try another kind of model like the General Linear Model:
+
+### assumptions ###
+# linearity, homoskedasticity (constant variance), normality, and independence
+  # the general linear model assumes that the relationships between the 
+  # outcome and any continuous predictors are linear. 
+
+# Based on the quiz score vs age plot from prev. investigation, the linearity assumption
+# is not met.
+# If we perform it anyhow:
+
+### GLM ###
+glm_model <- glm(grade ~ Text_version + Age + Gender, data = D, family = gaussian)
+summary(glm_model)
+
+"""
+Coefficients:
+                     Estimate Std. Error t value Pr(>|t|)  
+(Intercept)           46.3979    18.5345   2.503   0.0153 *
+Text_versionNeutral    1.6412     7.3992   0.222   0.8253
+Text_versionPositive   7.2165     7.6467   0.944   0.3494
+Age                    0.2332     0.7053   0.331   0.7422
+GenderMale             2.5224     6.4848   0.389   0.6988  
+GenderOther          -32.2274    24.4446  -1.318   0.1928
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for gaussian family taken to be 555.5776)
+
+    Null deviance: 32492  on 60  degrees of freedom
+Residual deviance: 30557  on 55  degrees of freedom
+AIC: 566.32
+
+Number of Fisher Scoring iterations: 2 
+"""
+# None of the predictors (Text_version, Age, Gender) significantly influence quiz scores
+# The model as a whole also might not be a good fit based on the null and residual deviance values
