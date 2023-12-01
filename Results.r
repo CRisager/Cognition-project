@@ -39,8 +39,7 @@ my_plot <- ggplot(D, aes(Text_version, grade, fill = color)) +
   coord_flip() +
   labs(x = "Text Version", y = "Grade")
 # Save the plot as an image (adjust the filename and extension as needed)
-ggsave("rain_cloud_plot.png", my_plot, width = 8, height = 8)
-
+ggsave("rain_cloud_plot.png", my_plot, width = 5, height = 5)
 
 
 
@@ -132,6 +131,23 @@ cor.test(ages, grades)$p.value # 0.8904612
 # Correlation p-values are also non-significant
 
 ### Grade vs gender ###
+# Rain cloud plot
+# Define colors based on Gender
+D$color <- ifelse(D$Gender == "Male", "turquoise2",
+                  ifelse(D$Gender == "Female", "plum1", "orange2"))
+# Create a rain cloud plot with ggrain
+my_plot <- ggplot(D, aes(Gender, grade, fill = color)) +
+  geom_rain(alpha = 0.5) +
+  scale_fill_identity() +  # Use identity scale for manual colors
+  theme_classic() +
+  guides(fill = 'none', color = 'none') +
+  coord_flip() +
+  labs(x = "Gender", y = "Grade")
+# Save the plot as an image (adjust the filename and extension as needed)
+ggsave("gender_vs_grade.png", my_plot, width = 5, height = 5)
+
+
+##################################################################
 male_grades <- D$grade[D$Gender == "Male"]
 female_grades <- D$grade[D$Gender == "Female"]
 other_grades <- D$grade[D$Gender == "Other"]
@@ -153,6 +169,7 @@ points(jittered_x3, other_grades, pch = 21, col = "black")
 axis(1, at = 1:3, labels = c("Male", "Female", "Other"), las = 1)
 axis(2, at = seq(0, 100, by = 10), labels = seq(0, 100, by = 10))
 title("Boxplots of grades")
+######################################################################
 
 # The "male" and "female" grades do not differ significantly fro each other
 # and the "other" grades have too few data points to be comparable. 
