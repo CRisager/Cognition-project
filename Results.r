@@ -96,6 +96,7 @@ average_cohen_d # 0.2365371 = small effect
 
 
 
+
 ############## ANCOVA assumptions ##################
 
 # Linear relationship between independent/covariates and dependent variable
@@ -130,7 +131,7 @@ other_grades <- D$grade[D$Gender == "Other"]
 # Boxplot
 # Create an empty plot with the desired range of the y-axis
 plot(1, type = "n", xlim = c(0, 4), ylim = c(0, 100), xlab = "Text sentiment", ylab = "Grade in %", xaxt = "n")
-# Create the boxplots
+# Create the boxplots 
 boxplot(male_grades, at = 1, add = TRUE, col = "#64cb6b")
 boxplot(female_grades, at = 2, add = TRUE, col = "skyblue")
 boxplot(other_grades, at = 3, add = TRUE, col = "coral")

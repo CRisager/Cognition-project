@@ -168,3 +168,25 @@ dev.off()
 # Bonferonni correction
 # ONLY PERFORM IF KRUSKAL P-VALUE < 0.05 ##### SO NOT #####
 #pairwise.wilcox.test(D$grade, D$Text_version, p.adj = "bonferroni")
+
+
+
+################ Examining covariates with ANCOVA ################### 
+
+# An important assumption for ANCOVA is residuals being normally distributed.
+
+# QQ-plot to investigate normality of residuals
+library(car)
+# QQ-plot of sentiment separation
+png(file = "QQplot_text_sep.png", units = "cm",
+    res = 1200, height = 1200 / 72, width = 1200 / 72)
+par(mfrow=c(1,3))
+qqPlot(positive_grades, ylab = "Given grades in %")
+title("Positive Text", line = 0.5, cex.main = 0.8) # Add a subtitle
+qqPlot(neutral_grades, ylab = "Given grades in %")
+title("Neutral Text", line = 0.5, cex.main = 0.8) # Add a subtitle
+mtext("QQ plot for grades", side = 3, line = 2)
+qqPlot(negative_grades, ylab = "Given grades in %")
+title("Negative Text", line = 0.5, cex.main = 0.8) # Add a subtitle
+dev.off()
+# They seem normally distributed. Let's continue.
