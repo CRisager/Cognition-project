@@ -110,6 +110,9 @@ abline(lm(D$grade ~ D$Age), col = "red")
 loess_fit <- loess(D$grade ~ D$Age)
 predicted_values <- predict(loess_fit, newdata = data.frame(Age = D$Age))
 lines(D$Age, predicted_values, col = "blue")
+# Calculate correlation p-value
+cor.test(D$Age, D$grade)$p.value # 0.9176092
+# Non significant correlation
 
 # Without the age outlier
 ages <- D$Age[D$Age < 40]
@@ -121,8 +124,12 @@ abline(lm(grades ~ ages), col = "red")
 loess_fit <- loess(grades ~ ages)
 predicted_values <- predict(loess_fit, newdata = data.frame(Age = ages))
 lines(ages, predicted_values, col = "blue")
+# Calculate correlation p-value
+cor.test(ages, grades)$p.value # 0.8904612
+# Non significant correlation
 
 # Both look very non-linear and with no clear relationship between the variables
+# Correlation p-values are also non-significant
 
 ### Grade vs gender ###
 male_grades <- D$grade[D$Gender == "Male"]
@@ -132,9 +139,9 @@ other_grades <- D$grade[D$Gender == "Other"]
 # Create an empty plot with the desired range of the y-axis
 plot(1, type = "n", xlim = c(0, 4), ylim = c(0, 100), xlab = "Text sentiment", ylab = "Grade in %", xaxt = "n")
 # Create the boxplots 
-boxplot(male_grades, at = 1, add = TRUE, col = "#64cb6b")
-boxplot(female_grades, at = 2, add = TRUE, col = "skyblue")
-boxplot(other_grades, at = 3, add = TRUE, col = "coral")
+boxplot(male_grades, at = 1, add = TRUE, col = "turquoise2")
+boxplot(female_grades, at = 2, add = TRUE, col = "plum1")
+boxplot(other_grades, at = 3, add = TRUE, col = "orange2")
 # Add the individual data points with random jitter
 jittered_x1 <- jitter(rep(1, length(male_grades)), factor = 1.5)
 jittered_x2 <- jitter(rep(2, length(female_grades)), factor = 1.5)
